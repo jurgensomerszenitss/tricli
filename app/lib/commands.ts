@@ -8,9 +8,9 @@ import { randomUUID } from 'crypto';
 import { formSchema, FormValues } from "@/app/lib/schemas";
 import * as dotenv from 'dotenv';
 
-dotenv.config(); 
-const DB_NAME:string = process.env.DB_NAME ?? '';
-const DB_HOST:string = process.env.DB_HOST ?? '';
+dotenv.config();
+const DB_NAME: string = process.env.DB_NAME ?? '';
+const DB_HOST: string = process.env.DB_HOST ?? '';
 
 export type State = {
   errors: {
@@ -32,7 +32,7 @@ export type State = {
     // openingHours?:string[][];
   };
   message?: string | null | undefined;
-  values : FormValues
+  values: FormValues
   // values: {
   //   name?: string;
   //   level?: number;
@@ -48,11 +48,15 @@ export type State = {
 const CreateRestaurant = formSchema.omit({});
 const UpdateRestaurant = formSchema.omit({});
 
-export async function createRestaurant(formData: FormValues) {
+export async function createRestaurant(formData: any) {
   let validatedFields: any;
+  const parsed = formSchema.parse(formData)
+  console.log(formData)
+  console.log(parsed)
 
   const store = new DocumentStore(DB_HOST, DB_NAME);
-  let session: IDocumentSession | null;
+  store.initialize();
+  const session = store.openSession();
 
   try {
     validatedFields = CreateRestaurant.safeParse({ ...formData });
@@ -66,8 +70,7 @@ export async function createRestaurant(formData: FormValues) {
     }
 
     // save it to RavenDb 
-    store.initialize();
-    session = store.openSession(); 
+
 
     const item: Restaurant = {
       id: randomUUID().replace(/-/g, ''),
@@ -100,11 +103,11 @@ export async function createRestaurant(formData: FormValues) {
 }
 
 export async function updateRestaurant(id: string, formData: FormValues) {
-  console.log(formData);
   let validatedFields: any;
 
   const store = new DocumentStore(DB_HOST, DB_NAME);
-  let session: IDocumentSession; 
+  store.initialize();
+  const session = store.openSession();
 
   try {
     validatedFields = UpdateRestaurant.safeParse({ ...formData });
@@ -117,15 +120,15 @@ export async function updateRestaurant(id: string, formData: FormValues) {
       };
     }
 
-    // save it to RavenDb 
-    store.initialize();
-    session = store.openSession();
-    let item:Restaurant | null = await session.load<Restaurant>(`restaurants/${id}`);
+    // save it to RavenDb  
+    let item: Restaurant | null = await session.load<Restaurant>(`restaurants/${id}`);
     if (!item) {
       throw new Error("Item not found")
     }
 
-    item = { ...item, ...validatedFields.data}  
+    item = { ...item, ...validatedFields.data }
+
+    console.log(item)
 
     await session.saveChanges();
 
@@ -148,5 +151,33 @@ export async function updateRestaurant(id: string, formData: FormValues) {
       revalidatePath("/dashboard");
       redirect("/dashboard");
     }
+  }
+}
+
+export async function deleteRestaurant(id: string) {
+  const store = new DocumentStore(DB_HOST, DB_NAME);
+  store.initialize();
+  const session = store.openSession();
+
+  try {
+    await session.delete<Restaurant>(`restaurants/${id}`);
+    await session.saveChanges();
+
+  } catch (error) {
+    if (error instanceof Error && error.message?.includes('NEXT_REDIRECT')) {
+      throw error;
+    }
+    console.log(error);
+    return {
+      errors: {},
+      message:
+        "An unexpected error occurred while removing the restaurant. Please try again later.",
+    };
+  } finally {
+    if (session) session.dispose();
+    if (store) store.dispose();
+
+    revalidatePath("/dashboard");
+    redirect("/dashboard");
   }
 }

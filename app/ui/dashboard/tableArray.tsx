@@ -18,30 +18,16 @@ export default function TableArray({ control, register, errors }: Props) {
         <div>
             {fields.map((field, index) => (
                 <div key={field.id} className="flex flex-col">
-                    <div className="grid grid-cols-6 gap-x-4 justify-items-stretch w-full">
-                        {/* Number */}
-                        <div className="col-span-1">
-                            <label htmlFor={`tables.${index}.number`} className="field-label">
-                                Number
-                            </label>
-                            <div className="relative">
-                                <input
-                                    {...register(`tables.${index}.number`, { valueAsNumber: true })}
-                                    type="number"
-                                    placeholder="Enter number"
-                                    className="form-field"
-                                />
-                            </div>
-                        </div>
+                    <div className="grid grid-cols-6 gap-x-4 justify-items-stretch w-full"> 
 
-                        {/* Info */}
+                        {/* Description */}
                         <div className="col-span-4">
-                            <label htmlFor={`tables.${index}.info`} className="field-label">
-                                Info
+                            <label htmlFor={`tables.${index}.description`} className="field-label">
+                                Description
                             </label>
                             <div className="flex flex-row items-center">
                                 <input
-                                    {...register(`tables.${index}.info`)}
+                                    {...register(`tables.${index}.description`)}
                                     type="text"
                                     placeholder="Enter info"
                                     className="form-field mr-2"
@@ -63,8 +49,7 @@ export default function TableArray({ control, register, errors }: Props) {
                         </div>
                     </div>
                     <div id="tables-error" aria-live="polite" aria-atomic="true">
-                        {errors.tables?.[index]?.number && (<p className="form-field-error">{errors.tables[index]?.number?.message}</p>)}
-                        {/* {state.errors?.tables?.[index]?.number && state.tables[index]?.number.map((error: string) => (<p className="form-field-error" key={error}>{error}</p>))} */}
+                        {errors.tables?.[index]?.description && (<p className="form-field-error">{errors.tables[index]?.description?.message}</p>)}
                     </div>
                 </div>
             ))}
