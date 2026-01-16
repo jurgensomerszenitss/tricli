@@ -13,14 +13,13 @@ export const formSchema = z.object({
     city: z.string().min(1, "Please enter a city.")
   }),
   contact: z.object({
-    email: z.email().optional().nullable(),
+    email: z.string().optional().nullable(),
     phone: z.string().optional().nullable(),
-    website: z.url().optional().nullable(),
+    website: z.string().optional().nullable(),
   }),
   tables: z.array(
     z.object({
-        number: z.number("Number should be greater than 0").gt(0, { message: "Number should be greater than 0" }),
-        info: z.string().optional().nullable(),
+        description: z.string().min(1, "Enter table description"),
         isOutside: z.boolean()
     }))
 });

@@ -20,8 +20,7 @@ export type Restaurant = {
 
 
 export type TableInfo = {
-    number: number,
-    info?: string | null | undefined,
+    description: string,
     isOutside: boolean
 
 }
