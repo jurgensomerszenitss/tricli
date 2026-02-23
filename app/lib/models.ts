@@ -12,10 +12,13 @@ export type Restaurant = {
     level: number;
     hasParking: boolean;
     hasTerrace: boolean;
-    openingHours: [OpeningHour],
-    address: Address,
+    // address: Address,
+    address: string,
     contact: ContactInfo,
-    tables: [TableInfo],
+    tables: TableInfo[],
+    openingHours: OpeningHour[],
+    openingRange: TimeRange[],
+    remarks:string,
 }
 
 
@@ -29,6 +32,11 @@ export type OpeningHour = {
     day: number,
     from: string,
     to: string
+}
+
+export type TimeRange = {
+    start: number,
+    end: number
 }
 
 export type Address = {
@@ -50,4 +58,11 @@ export type Card = {
     hasParking: boolean;
     hasTerrace: boolean;
     isOpenNow: boolean;
+}
+
+export type User = {
+    id: string;
+    name: string;
+    email: string;
+    password: string;
 }

@@ -17,14 +17,10 @@ export default function TableArray({ control, register, errors }: Props) {
     return (
         <div>
             {fields.map((field, index) => (
-                <div key={field.id} className="flex flex-col">
-                    <div className="grid grid-cols-6 gap-x-4 justify-items-stretch w-full"> 
-
+                <div key={field.id} className="flex flex-col gap-1">
+                    <div className="grid grid-cols-4 gap-x-2  justify-items-stretch w-full">  
                         {/* Description */}
-                        <div className="col-span-4">
-                            <label htmlFor={`tables.${index}.description`} className="field-label">
-                                Description
-                            </label>
+                        <div className="col-span-3">
                             <div className="flex flex-row items-center">
                                 <input
                                     {...register(`tables.${index}.description`)}
@@ -44,7 +40,7 @@ export default function TableArray({ control, register, errors }: Props) {
                             </div>
                         </div>
 
-                        <div className="col-span-1 flex justify-end align-bottom items-center">
+                        <div className="col-span-1 flex justify-end align-bottom items-center ">
                             <div onClick={() => remove(index)} className="button-form-red">-</div>
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 import Image from "next/image"
-import SearchText from '@/app/ui/dashboard/searchText';
-import SearchCheckbox from "@/app/ui/dashboard/searchCheckbox";
+import SearchText from '@/app/ui/dashboard/search-text';
+import SearchCheckbox from "@/app/ui/dashboard/search-checkbox";
 
 export default function Filter() {
   return (
