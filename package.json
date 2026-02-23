@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "deploy:build": "docker build -t tricli --no-cache .",
+    "deploy:local": "docker compose -p tricli up -d"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -39,6 +41,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
+    "baseline-browser-mapping": "^2.10.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.8",
     "jest": "^30.2.0",

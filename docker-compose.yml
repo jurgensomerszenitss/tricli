@@ -4,61 +4,32 @@ services:
   web:
     container_name: tricli
     build:
-      context: ./web
+      context: ./app
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "5004:3000"
     environment:
       # Internal service URLs
       DB_NAME: tricli
-      DB_HOST: http://ravendb:8080 
-      # AUTH_KEYCLOAK_ID:  
-      # AUTH_KEYCLOAK_SECRET: 
-      # AUTH_KEYCLOAK_ISSUER:  
+      DB_HOST: http://ravendb:8080
     depends_on:
-      - ravendb
-      # - keycloak
+      - ravendb 
     networks:
       - public
       - private
 
   ravendb:
     container_name: ravendb
-    image: ravendb/ravendb:latest
-    command: >
-      -c /ravendb/config/settings.json
+    image: ravendb/ravendb:latest 
     environment:
       RAVEN_Setup_Mode: None
       RAVEN_Security_UnsecuredAccessAllowed: PrivateNetwork
     volumes:
-      - ravendb-data:/var/lib/ravendb/data
+      # - c:/RavenDb/Tricli/Data:/opt/RavenDB/Server/RavenData
+      - /etc/tricli/data:/opt/RavenDB/Server/RavenData
     networks:
       - private
-
-  # keycloak:
-  #   container_name: keycloak
-  #   image: quay.io/keycloak/keycloak:latest
-  #   command: start-dev
-  #   environment:
-  #     KEYCLOAK_ADMIN: admin
-  #     KEYCLOAK_ADMIN_PASSWORD: admin
-  #   depends_on:
-  #     - keycloak-db
-  #   networks:
-  #     - private
-
-  # keycloak-db:
-  #   container_name: keycloak-db
-  #   image: postgres:15
-  #   environment:
-  #     POSTGRES_DB: keycloak
-  #     POSTGRES_USER: keycloak
-  #     POSTGRES_PASSWORD: keycloak
-  #   volumes:
-  #     - keycloak-db-data:/var/lib/postgresql/data
-  #   networks:
-  #     - private
-
+ 
 networks:
   public:
     driver: bridge
@@ -68,5 +39,4 @@ networks:
     internal: true
 
 volumes:
-  ravendb-data:
-  # keycloak-db-data:
+  ravendb-data: 

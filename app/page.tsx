@@ -1,5 +1,6 @@
-import Image from "next/image"; 
-import LoginForm from "@/app/ui/login-form"; 
+import Image from "next/image";
+import LoginForm from "@/app/ui/login-form";
+import { Suspense } from "react";
 
 export default function Home() {
   return (
@@ -13,11 +14,13 @@ export default function Home() {
             width={100}
             height={20}
             priority
-          /> 
+          />
           <h2>This is the application that hosts the list of our favorite triangles corners</h2>
-        </div> 
+        </div>
         <div className="w-full flex items-center justify-center">
-        <LoginForm></LoginForm>
+          <Suspense fallback={<>...</>}>
+            <LoginForm></LoginForm>
+          </Suspense> 
         </div>
       </main>
     </div>

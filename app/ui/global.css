@@ -1,6 +1,4 @@
 @import "tailwindcss";
-/* @import "./react-datetime.css"; */
-@import "react-datetime/css/react-datetime.css";
 
 :root {
   --background: var(--color-neutral-200);

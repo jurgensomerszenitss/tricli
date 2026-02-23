@@ -1,38 +1,49 @@
 # -------- Base --------
-FROM node:20-alpine AS base
+FROM node:alpine AS base
 WORKDIR /app
 ENV NODE_ENV=production
 
 # -------- Dependencies --------
 FROM base AS deps
-COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
+COPY package.json ./
 
 RUN \
   if [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then corepack enable && pnpm install --frozen-lockfile; \
-  elif [ -f yarn.lock ]; then yarn install --frozen-lockfile; \
   else echo "No lockfile found" && exit 1; \
   fi
 
 # -------- Build --------
 FROM base AS builder
-COPY --from=deps /app/node_modules ./node_modules
+# RUN npm init
+# COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 RUN npm run build
 
 # -------- Runtime --------
-FROM node:20-alpine AS runner
+FROM node:alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
 ENV PORT=3000
 
 # Next.js runtime needs these
-COPY --from=builder /app/public ./public
+# COPY --from=builder /app/public ./public
+# COPY --from=builder /app/.next ./.next
+# COPY --from=builder /app/node_modules ./node_modules
+# COPY --from=builder /app/package.json ./package.json
+
+# Only copy necessary files
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/package-lock.json* ./ 
+
+# Install only production dependencies
+RUN npm ci --omit=dev || true
+
+# Copy built Next.js files
 COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/next.config.js ./
 
 EXPOSE 3000
 

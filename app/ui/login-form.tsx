@@ -1,9 +1,6 @@
 'use client';
-import { useSearchParams } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { loginFormSchema, LoginFormValues } from "../lib/schemas";
-import { useActionState, useState } from "react";
+import { useSearchParams } from "next/navigation"; 
+import { useActionState, } from "react";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import { Button } from '@/app/ui/button';
 import { authenticate } from "@/app/lib/auth";

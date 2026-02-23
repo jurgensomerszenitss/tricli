@@ -17,29 +17,11 @@ export const authConfig = {
   session: {
     strategy: "jwt",
   },
-  callbacks: {
-    // async jwt({ token, account }) {
-    //   // Persist access token
-    //   if (account) {
-    //     token.accessToken = account.access_token;
-    //     token.idToken = account.id_token;
-    //   }
-    //   return token;
-    // },
-    // async session({ session, token }) {
-    //   // console.log(session)
-    //   return session;
-    // },
-    async authorized({ auth }) {
-      // console.log(auth)
+  callbacks: { 
+    async authorized({ auth }) { 
       return !!auth
-    },
-    // async redirect({url, baseUrl}) {
-    //   return baseUrl
-    // }
-  },
-  // providers: [Keycloak],
-
+    }, 
+  },  
   providers: [
     CredentialsProvider({
       async authorize(credentials): Promise<any> {

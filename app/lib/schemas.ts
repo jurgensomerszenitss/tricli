@@ -1,22 +1,32 @@
 import { z } from "zod";
 import { formatPhoneNumber } from "./maps";
 
-const phoneSchema = z.preprocess(
-  (val) => (val === "" ? undefined : val),
-  z
-    .string()
+// const phoneSchema = z.preprocess(
+//   (val) => (val === "" ? undefined : val),
+//   z
+//     .string()
+//     .regex(
+//       /^(?:\d{11}|\+\d \(\d{3}\) \d{3}-\d{2}-\d{2})$/,
+//       "Must be a valid phone number (XXXXXXXXXXX or +X (XXX) XXX-XX-XX)"
+//     )
+//     .transform((val) => formatPhoneNumber(val))
+//     .optional()
+//     .nullable()
+// );
+
+const phoneSchema = z.string()
     .regex(
       /^(?:\d{11}|\+\d \(\d{3}\) \d{3}-\d{2}-\d{2})$/,
       "Must be a valid phone number (XXXXXXXXXXX or +X (XXX) XXX-XX-XX)"
     )
     .transform((val) => formatPhoneNumber(val))
+    .or(z.undefined()).or(z.null()).or(z.literal(""))
     .optional()
     .nullable()
-);
 
 const contactSchema = z.object({
     email: z.email().or(z.string().max(0).optional().nullable()),
-    phone: phoneSchema,
+    phone: phoneSchema.optional().nullable(),
     website: z.string().optional().nullable(),
   })
 

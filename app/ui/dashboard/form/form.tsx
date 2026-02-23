@@ -168,9 +168,9 @@ export default function Form({ initialValues, onSubmit }: Props) {
                     </div>
 
                     {/* Photos */}
-                    <div className="form-card">
+                    {/* <div className="form-card">
                         <div className="form-card-title"><PhotoIcon className="h-6 w-6"></PhotoIcon>Photos</div>
-                    </div>
+                    </div> */}
 
                     {/* Remarks */}
                     <div className="form-card">
