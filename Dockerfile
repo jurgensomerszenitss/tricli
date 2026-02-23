@@ -6,7 +6,7 @@ ENV NODE_ENV=production
 # -------- Dependencies --------
 FROM base AS deps
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm install
 
 # -------- Build --------
 FROM base AS builder
