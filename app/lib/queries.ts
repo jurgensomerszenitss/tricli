@@ -1,7 +1,8 @@
 import { DocumentStore } from "ravendb";
 import { FormValues } from "./schemas";
 import * as dotenv from 'dotenv';
-import { Restaurant } from "./models";
+import { Restaurant, User } from "./models";
+import { toWeekMinutes } from "./maps";
 
 dotenv.config();
 const DB_NAME: string = process.env.DB_NAME ?? '';
@@ -11,10 +12,10 @@ export async function getDashboard(filter: any): Promise<any> {
   const store = new DocumentStore(DB_HOST, DB_NAME);
   let session: any;
   try {
-    await store.initialize();
+    store.initialize();
     session = store.openSession();
 
-    var query = session.query("restaurants");
+    var query = session.query({ collection: "restaurants" });
 
     if (filter) {
       if (filter.query)
@@ -23,6 +24,11 @@ export async function getDashboard(filter: any): Promise<any> {
         query = query.whereEquals("hasParking", true);
       if (filter.hasTerrace == "true")
         query = query.whereEquals("hasTerrace", true);
+      if (filter?.isOpen == "true")  {
+        const now = toWeekMinutes(new Date().getDay(), new Date().toTimeString())
+        query = query.whereGreaterThanOrEqual("openingRange[].start", now)
+                     .whereLessThanOrEqual("openingRange[].end", now-120)
+      }
     }
 
     const all = await query.orderBy("name").all();
@@ -44,10 +50,10 @@ export async function getRestaurant(id: string): Promise<FormValues> {
   const store = new DocumentStore(DB_HOST, DB_NAME);
   let session: any;
   try {
-    await store.initialize();
+    store.initialize();
     session = store.openSession();
 
-    const item: Restaurant = await session.query("restaurants").whereEquals('id', `restaurants/${id}`).firstOrNull();
+    const item: Restaurant = await session.query({ collection: "restaurants" }).whereEquals('id', `restaurants/${id}`).firstOrNull();
 
     const fv: FormValues = {
       name: item.name,
@@ -56,7 +62,9 @@ export async function getRestaurant(id: string): Promise<FormValues> {
       hasTerrace: item.hasTerrace,
       address: item.address,
       contact: item.contact,
-      tables: item.tables
+      tables: item.tables,
+      openingHours: item.openingHours ?? [ { day:0},{ day:1},{ day:2},{ day:3},{ day:4},{ day:5},{ day:6}  ],
+      remarks: item.remarks
     }
 
     return fv;
@@ -64,6 +72,25 @@ export async function getRestaurant(id: string): Promise<FormValues> {
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch restaurant data.');
+  } finally {
+    if (session) session.dispose();
+    if (store) store.dispose();
+  }
+}
+
+export async function getUser(email:string) : Promise<User> {
+  const store = new DocumentStore(DB_HOST, DB_NAME);
+  let session: any;
+  try {
+    store.initialize();
+    session = store.openSession();
+
+    const user: User = await session.query({ collection: "users" }).whereEquals('email', email.toLowerCase()).firstOrNull();
+    return user;
+
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch user data.');
   } finally {
     if (session) session.dispose();
     if (store) store.dispose();
