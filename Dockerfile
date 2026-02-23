@@ -31,7 +31,7 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/package-lock.json ./
 
 # Install production deps only
-RUN npm ci --omit=dev
+RUN npm install
 
 # Copy build output
 COPY --from=builder /app/.next ./.next
