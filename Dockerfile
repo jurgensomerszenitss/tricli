@@ -1,29 +1,36 @@
-# -------- Base --------
+# -------- Builder --------
 FROM node:alpine AS base
 WORKDIR /app
-ENV NODE_ENV=production
-
-# -------- Dependencies --------
-FROM base AS deps
-COPY package.json package-lock.json ./
-RUN npm install
+# ENV NODE_ENV=production
 
 # -------- Build --------
 FROM base AS builder
-WORKDIR /app
+WORKDIR /app 
+COPY package.json package-lock.json* yarn.lock* pnpm-lock.yaml* ./
 
-# Copy installed dependencies
-COPY --from=deps /app/node_modules ./node_modules
+# Install project dependencies with frozen lockfile for reproducible builds
+RUN \
+  if [ -f package-lock.json ]; then npm install; \
+  elif [ -f yarn.lock ]; then yarn install --frozen-lockfile; \
+  elif [ -f pnpm-lock.yaml ]; then npm install -g pnpm && pnpm install --frozen-lockfile; \
+  else npm install; \
+  fi 
+ 
+# Copy source
+COPY . . 
 
-# Copy source code
-COPY . .
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Build Next.js
+# Build standalone output
 RUN npm run build
+
 
 # -------- Runtime --------
 FROM node:alpine AS runner
 WORKDIR /app
+
+ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 ENV PORT=3000
 
@@ -31,12 +38,20 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/package-lock.json ./
 
 # Install production deps only
-RUN npm install
+# RUN npm install
 
 # Copy build output
-COPY --from=builder /app/.next ./.next
+# COPY --from=builder /app/.next ./.next
+# COPY --from=builder /app/public ./public
+# COPY --from=builder /app/next.config.ts ./
+
+# Copy standalone output only
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/next.config.js ./
+# RUN addgroup -S nextjs && adduser -S nextjs -G nextjs
 
 EXPOSE 3000
-CMD ["npm", "start"]
+# CMD ["npm", "start"]
+
+CMD ["node", "server.js"]
