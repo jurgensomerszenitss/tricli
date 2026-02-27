@@ -8,32 +8,62 @@ env:
   IMAGE_NAME: ${{ github.actor }}/tricli:latest
 
 jobs:
-  publish:
-    name: publish image
+  build:
+    name: build image
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: login
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Login to GHCR
+      run: echo "${{ secrets.GH_SECRET }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+    - name: Build image
       run: |
-        echo ${{ secrets.GH_SECRET }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-    - name: Build and Publish
-      run: |
-        docker build . --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-        docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        docker build -t $IMAGE_NAME:latest .
+        docker tag $IMAGE_NAME:latest $IMAGE_NAME:${{ github.sha }}
+
+    # - uses: actions/checkout@v4
+    # - name: login
+    #   run: |
+    #     echo ${{ secrets.GH_SECRET }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+    # - name: Build and Publish
+    #   run: |
+    #     docker build . --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+    #     docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
   deploy:
-    needs: publish
-    name: deploy image
+    needs: build
+    name: push image
     runs-on: ubuntu-latest
 
     steps:
-      - name: install ssh keys
-        run: |
-          install -m 600 -D /dev/null ~.ssh/id_rsa
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~ /.ssh/known_hosts
-      - name: connect and pull
-        run: ssh ${{ secrets.SSH_USER }}@{{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && docker compose pull && docker compose up -p tricli -d && exit"
-      - name: cleanup
-        run: rm -rf ~/.ssh
+    - name: Push image
+      run: |
+        docker push $IMAGE_NAME:latest
+        docker push $IMAGE_NAME:${{ github.sha }}
+    - name: Deploy to VPS
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd /etc/tricli/app
+          echo "AUTH_SECRET=${{ secrets.APP_ENV_AUTH_SECRET }}" > .env
+          echo "GOOGLE_API_KEY=${{ secrets.APP_ENV_GOOGLE_API_KEY }}" >> .env
+          echo "${{ secrets.GH_SECRET }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker pull $IMAGE_NAME:latest
+          docker compose down 
+          docker compose -p tricli up -d --pull always --remove-orphans
+      # docker run -d --name app -p 80:3000 $IMAGE_NAME:latest
+      # - name: install ssh keys
+      #   run: |
+      #     install -m 600 -D /dev/null ~.ssh/id_rsa
+      #     echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+      #     ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~ /.ssh/known_hosts
+      # - name: connect and pull
+      #   run: ssh ${{ secrets.SSH_USER }}@{{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && docker compose pull && docker compose up -p tricli -d && exit"
+      # - name: cleanup
+      #   run: rm -rf ~/.ssh
