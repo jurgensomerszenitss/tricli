@@ -1,7 +1,8 @@
 services:
   web:
     container_name: tricli
-    image: tricli:latest
+    # image: tricli:latest
+    image: ghcr.io/jurgensomerszenitss/tricli:latest
     build:
       # context: ./app
       dockerfile: Dockerfile
@@ -12,6 +13,7 @@ services:
       DB_NAME: tricli
       DB_HOST: http://ravendb:8080
       GOOGLE_API_KEY: AIzaSyBUSKtEvCX1i8izG5aJh_xUB-CxZbXRPyM
+      AUTH_SECRET: 83c17d86c08344bdbcc9895a4cdec5e4
     depends_on:
       - ravendb 
     networks:
@@ -25,8 +27,8 @@ services:
       RAVEN_Setup_Mode: None
       RAVEN_Security_UnsecuredAccessAllowed: PrivateNetwork
     volumes:
-      - c:/RavenDb/Tricli/Data:/opt/RavenDB/Server/RavenData
-      # - /etc/tricli/data:/opt/RavenDB/Server/RavenData
+      # - c:/RavenDb/Tricli/Data:/opt/RavenDB/Server/RavenData
+      - /etc/tricli/data:/opt/RavenDB/Server/RavenData
     networks:
       - private
  

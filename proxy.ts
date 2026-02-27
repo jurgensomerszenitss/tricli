@@ -6,9 +6,9 @@ export async function proxy(request: NextRequest) {
   // Check for authentication
   const session = await auth(); 
   
-  if (request.nextUrl.pathname !== '/' && !session) {  
-    return NextResponse.redirect(new URL(`/?callbackUrl=${request.url}`, request.url)) 
-  }
+  // if (request.nextUrl.pathname !== '/' && !session) {  
+  //   return NextResponse.redirect(new URL(`/?callbackUrl=${request.url}`, request.url)) 
+  // }
  
   return NextResponse.next();
 }
