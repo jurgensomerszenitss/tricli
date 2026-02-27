@@ -33,12 +33,12 @@ jobs:
     #     docker build . --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
     #     docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-  deploy:
-    needs: build
-    name: push image
-    runs-on: ubuntu-latest
+  # deploy:
+  #   needs: build
+    # name: push image
+    # runs-on: ubuntu-latest
 
-    steps:
+    # steps:
     - name: Push image
       run: |
         docker push $IMAGE_NAME:latest

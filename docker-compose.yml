@@ -12,8 +12,6 @@ services:
       # Internal service URLs
       DB_NAME: tricli
       DB_HOST: http://ravendb:8080
-      GOOGLE_API_KEY: AIzaSyBUSKtEvCX1i8izG5aJh_xUB-CxZbXRPyM
-      AUTH_SECRET: 83c17d86c08344bdbcc9895a4cdec5e4
     depends_on:
       - ravendb 
     networks:
