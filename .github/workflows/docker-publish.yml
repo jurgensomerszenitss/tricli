@@ -5,7 +5,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.actor }}/$IMAGE_NAME:latest
+  IMAGE_NAME: ${{ github.actor }}/tricli
 
 jobs:
   build:
