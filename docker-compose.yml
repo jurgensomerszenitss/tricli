@@ -24,38 +24,37 @@ services:
     environment:
       RAVEN_Setup_Mode: None
       RAVEN_Security_UnsecuredAccessAllowed: PrivateNetwork
-    volumes:
-      # - c:/RavenDb/Tricli/Data:/opt/RavenDB/Server/RavenData
+    volumes: 
       - /etc/tricli/data:/opt/RavenDB/Server/RavenData
     networks:
       - private
     
-  nginx:
-    image: nginx:alpine
-    container_name: tricli-nginx
-    ports:
-      - "80:80"
-      - "4443:443"
-    volumes:
-      - /etc/tricli/nginx/conf.d:/etc/nginx/conf.d
-      - ./certs:/etc/letsencrypt
-      - /etc/tricli/certbot/www:/var/www/certbot
-    depends_on:
-      - app
-    networks:
-      - public
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: tricli-nginx
+  #   ports:
+  #     - "80:80"
+  #     - "4443:443"
+  #   volumes:
+  #     - /etc/tricli/nginx/conf.d:/etc/nginx/conf.d
+  #     - ./certs:/etc/letsencrypt
+  #     - /etc/tricli/certbot/www:/var/www/certbot
+  #   depends_on:
+  #     - app
+  #   networks:
+  #     - public
   
-  certbot:
-    image: certbot/certbot
-    container_name: tricli-certbot
-    volumes:
-      - ./certs:/etc/letsencrypt
-      - /etc/tricli/nginx/conf.d:/etc/nginx/conf.d
-      - /etc/tricli/certbot/www:/var/www/certbot
-    entrypoint: >
-      sh -c "certbot certonly --webroot -w /var/www/certbot -d zenitss.eu -d tricli.zenitss.eu --email jurgen@zenitss.eu --agree-tos --non-interactive"
-    networks:
-      - public
+  # certbot:
+  #   image: certbot/certbot
+  #   container_name: tricli-certbot
+  #   volumes:
+  #     - ./certs:/etc/letsencrypt
+  #     - /etc/tricli/nginx/conf.d:/etc/nginx/conf.d
+  #     - /etc/tricli/certbot/www:/var/www/certbot
+  #   entrypoint: >
+  #     sh -c "certbot certonly --webroot -w /var/www/certbot -d zenitss.eu -d tricli.zenitss.eu --email jurgen@zenitss.eu --agree-tos --non-interactive"
+  #   networks:
+  #     - public
  
 networks:
   public:

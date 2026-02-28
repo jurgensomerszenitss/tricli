@@ -48,7 +48,7 @@ jobs:
         script: |
           cd /etc/tricli/app
           echo "AUTH_SECRET=${{ secrets.APP_ENV_AUTH_SECRET }}" > .env
-          echo "GOOGLE_API_KEY=${{ secrets.APP_ENV_GOOGLE_API_KEY }}" > .env           
+          echo "GOOGLE_API_KEY=${{ secrets.APP_ENV_GOOGLE_API_KEY }}" >> .env           
           echo "${{ secrets.GH_SECRET }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
           docker pull ghcr.io/${{ github.repository }}/tricli:latest
           docker compose down 
