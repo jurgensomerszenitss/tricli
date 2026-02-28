@@ -7,7 +7,8 @@ services:
       # context: ./app
       dockerfile: Dockerfile
     ports:
-      - "5004:3000"
+      - "80:3000"
+      - "8080:3000"
     environment:
       # Internal service URLs
       DB_NAME: tricli

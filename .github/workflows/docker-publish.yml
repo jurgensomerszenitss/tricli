@@ -48,18 +48,8 @@ jobs:
         script: |
           cd /etc/tricli/app
           echo "AUTH_SECRET=${{ secrets.APP_ENV_AUTH_SECRET }}" > .env
-          echo "GOOGLE_API_KEY=${{ secrets.APP_ENV_GOOGLE_API_KEY }}" >> .env
+          echo "GOOGLE_API_KEY=${{ secrets.APP_ENV_GOOGLE_API_KEY }}" > .env
           echo "${{ secrets.GH_SECRET }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-          docker pull $IMAGE_NAME:latest
+          docker pull ghcr.io/${{ github.repository }}/tricli:latest
           docker compose down 
-          docker compose -p tricli up -d --pull always --remove-orphans
-      # docker run -d --name app -p 80:3000 $IMAGE_NAME:latest
-      # - name: install ssh keys
-      #   run: |
-      #     install -m 600 -D /dev/null ~.ssh/id_rsa
-      #     echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-      #     ssh-keyscan -H ${{ secrets.SSH_HOST }} > ~ /.ssh/known_hosts
-      # - name: connect and pull
-      #   run: ssh ${{ secrets.SSH_USER }}@{{ secrets.SSH_HOST }} "cd ${{ secrets.WORK_DIR }} && docker compose pull && docker compose up -p tricli -d && exit"
-      # - name: cleanup
-      #   run: rm -rf ~/.ssh
+          docker compose -p tricli up -d --pull always --remove-orphans 
