@@ -12,7 +12,7 @@ export async function getDashboard(filter: any): Promise<any> {
 
     if (filter) {
       if (filter.query)
-        query = query.whereRegex('name', `^${filter.query}.*`, 'i');
+        query = query.whereRegex('name', `^${filter.query}.*`);
       if (filter.hasParking == "true")
         query = query.whereEquals("hasParking", true);
       if (filter.hasTerrace == "true")
