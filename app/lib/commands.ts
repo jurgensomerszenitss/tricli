@@ -11,7 +11,7 @@ import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
 import * as bcrypt from "bcrypt";
 import { buildTimeRanges, formatPhoneNumber } from "./maps";
-import { store } from "@/app/lib/ravendb"
+import { store, ensureDatabaseExists } from "@/app/lib/ravendb"
  
 
 export type State = {
@@ -208,6 +208,8 @@ export async function createUser(
 ) {
   
   const session = store.openSession();
+
+  await ensureDatabaseExists()
 
   const saltRounds = 10;
   const hash = await bcrypt.hash(password, saltRounds);
