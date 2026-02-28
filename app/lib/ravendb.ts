@@ -9,12 +9,19 @@ import * as dotenv from "dotenv";
 dotenv.config();
 const DB_NAME: string = process.env.DB_NAME ?? "";
 const DB_HOST: string = process.env.DB_HOST ?? "";
- 
-export const store = new DocumentStore(DB_HOST,DB_NAME)
-store.initialize(); 
+
+export function getSession() { 
+    const store = new DocumentStore(DB_HOST,DB_NAME);
+    store.initialize(); 
+    return store.openSession();
+}
+
+
  
 export async function ensureDatabaseExists() { 
-    try {
+    const store = new DocumentStore(DB_HOST,DB_NAME);
+    store.initialize(); 
+    try { 
         // Try to get database info
         await store.maintenance.server.send(new GetDatabaseRecordOperation(DB_NAME));
     } catch (err:any) {

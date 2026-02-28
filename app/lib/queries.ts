@@ -1,12 +1,12 @@
 import { FormValues } from "./schemas"; 
 import { Restaurant, User } from "./models";
 import { toWeekMinutes } from "./maps";
-import { store } from "@/app/lib/ravendb"
+import { getSession } from "@/app/lib/ravendb"
  
 
 export async function getDashboard(filter: any): Promise<any> {
     
-  const session = store.openSession();
+  const session = getSession();
   try { 
     var query = session.query({ collection: "restaurants" });
 
@@ -40,7 +40,7 @@ export async function getDashboard(filter: any): Promise<any> {
 
 export async function getRestaurant(id: string): Promise<FormValues> {
 
-  const session = store.openSession();
+  const session = getSession();
   try { 
 
     const item = await session.query<Restaurant>({ collection: "restaurants" }).whereEquals('id', `restaurants/${id}`).firstOrNull();
@@ -72,7 +72,7 @@ export async function getRestaurant(id: string): Promise<FormValues> {
 }
 
 export async function getUser(email:string) : Promise<User | null> {
-  const session = store.openSession();
+  const session = getSession();
   try { 
     
 

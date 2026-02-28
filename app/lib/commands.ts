@@ -11,7 +11,7 @@ import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
 import * as bcrypt from "bcrypt";
 import { buildTimeRanges, formatPhoneNumber } from "./maps";
-import { store, ensureDatabaseExists } from "@/app/lib/ravendb"
+import { getSession, ensureDatabaseExists } from "@/app/lib/ravendb"
  
 
 export type State = {
@@ -47,7 +47,7 @@ function setCollection(
 export async function createRestaurant(formData: FormValues) {
   let validatedFields: any; 
    
-  const session = store.openSession();
+  const session = getSession();
 
   try {
     validatedFields = CreateRestaurant.safeParse({ ...formData });
@@ -82,8 +82,7 @@ export async function createRestaurant(formData: FormValues) {
       values: formData,
     };
   } finally {
-    if (session) session.dispose();
-    if (store) store.dispose();
+    if (session) session.dispose(); 
 
     if (validatedFields?.success) {
       revalidatePath("/dashboard");
@@ -95,7 +94,7 @@ export async function createRestaurant(formData: FormValues) {
 export async function updateRestaurant(id: string, formData: FormValues) {
   let validatedFields: any;
  
-  const session = store.openSession();
+  const session = getSession();
 
   try {
     validatedFields = UpdateRestaurant.safeParse({ ...formData });
@@ -140,8 +139,7 @@ export async function updateRestaurant(id: string, formData: FormValues) {
       values: formData,
     };
   } finally {
-    if (session) session.dispose();
-    if (store) store.dispose();
+    if (session) session.dispose(); 
 
     if (validatedFields?.success) {
       revalidatePath("/dashboard");
@@ -152,7 +150,7 @@ export async function updateRestaurant(id: string, formData: FormValues) {
 
 export async function addPhoto(id: string, file: any) {
    
-  const session = store.openSession();
+  const session = getSession();
 
   // 2️⃣ Attach the image
   const fileStream = fs.createReadStream(file.filepath);
@@ -177,7 +175,7 @@ export async function addPhoto(id: string, file: any) {
 
 export async function deleteRestaurant(id: string) {
   
-  const session = store.openSession();
+  const session = getSession();
 
   try {
     await session.delete<Restaurant>(`restaurants/${id}`);
@@ -193,8 +191,7 @@ export async function deleteRestaurant(id: string) {
         "An unexpected error occurred while removing the restaurant. Please try again later.",
     };
   } finally {
-    if (session) session.dispose();
-    if (store) store.dispose();
+    if (session) session.dispose(); 
 
     revalidatePath("/dashboard");
     redirect("/dashboard");
@@ -207,7 +204,7 @@ export async function createUser(
   password: string,
 ) {
   
-  const session = store.openSession();
+  const session = getSession();
 
   await ensureDatabaseExists()
 
