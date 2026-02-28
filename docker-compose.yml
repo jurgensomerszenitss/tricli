@@ -2,7 +2,7 @@ services:
   web:
     container_name: tricli
     # image: tricli:latest
-    image: ghcr.io/jurgensomerszenitss/tricli:latest
+    image: ghcr.io/jurgensomerszenitss/tricli/tricli:latest
     build:
       # context: ./app
       dockerfile: Dockerfile

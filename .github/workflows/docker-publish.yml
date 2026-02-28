@@ -9,11 +9,11 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.actor }}/tricli
+  IMAGE_NAME: ghcr.io/${{ github.repository }}/tricli
 
 jobs:
   build:
-    name: build image
+    name: build
     runs-on: ubuntu-latest
 
     steps:
@@ -35,7 +35,7 @@ jobs:
 
   deploy:
     needs: build
-    name: push image
+    name: deploy
     runs-on: ubuntu-latest
 
     steps: 
