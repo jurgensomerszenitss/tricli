@@ -16,10 +16,11 @@ store.initialize();
 
 // 2. Function to ensure database exists
 async function ensureDatabaseExists(dbName: string) {
+    if(!DB_HOST || DB_HOST == "") return
+    
     try {
         // Try to get database info
         await store.maintenance.server.send(new GetDatabaseRecordOperation(dbName));
-        console.log(`Database "${dbName}" already exists.`);
     } catch (err:any) {
         // If database doesn't exist, create it
         if (err.message.includes("DatabaseDoesNotExistException")) {
