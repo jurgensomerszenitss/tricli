@@ -1,20 +1,13 @@
-import { DocumentStore } from "ravendb";
-import { FormValues } from "./schemas";
-import * as dotenv from 'dotenv';
+import { FormValues } from "./schemas"; 
 import { Restaurant, User } from "./models";
 import { toWeekMinutes } from "./maps";
-
-dotenv.config();
-const DB_NAME: string = process.env.DB_NAME ?? '';
-const DB_HOST: string = process.env.DB_HOST ?? '';
+import { store } from "@/app/lib/ravendb"
+ 
 
 export async function getDashboard(filter: any): Promise<any> {
-  const store = new DocumentStore(DB_HOST, DB_NAME);
-  let session: any;
-  try {
-    store.initialize();
-    session = store.openSession();
-
+    
+  const session = store.openSession();
+  try { 
     var query = session.query({ collection: "restaurants" });
 
     if (filter) {
@@ -41,19 +34,20 @@ export async function getDashboard(filter: any): Promise<any> {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch restaurant data.');
   } finally {
-    if (session) session.dispose();
-    if (store) store.dispose();
+    if (session) session.dispose(); 
   }
 }
 
 export async function getRestaurant(id: string): Promise<FormValues> {
-  const store = new DocumentStore(DB_HOST, DB_NAME);
-  let session: any;
-  try {
-    store.initialize();
-    session = store.openSession();
 
-    const item: Restaurant = await session.query({ collection: "restaurants" }).whereEquals('id', `restaurants/${id}`).firstOrNull();
+  const session = store.openSession();
+  try { 
+
+    const item = await session.query<Restaurant>({ collection: "restaurants" }).whereEquals('id', `restaurants/${id}`).firstOrNull();
+
+    if (!item) {
+      throw new Error('Restaurant not found.');
+    }
 
     const fv: FormValues = {
       name: item.name,
@@ -73,26 +67,22 @@ export async function getRestaurant(id: string): Promise<FormValues> {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch restaurant data.');
   } finally {
-    if (session) session.dispose();
-    if (store) store.dispose();
+    if (session) session.dispose(); 
   }
 }
 
-export async function getUser(email:string) : Promise<User> {
-  const store = new DocumentStore(DB_HOST, DB_NAME);
-  let session: any;
-  try {
-    store.initialize();
-    session = store.openSession();
+export async function getUser(email:string) : Promise<User | null> {
+  const session = store.openSession();
+  try { 
+    
 
-    const user: User = await session.query({ collection: "users" }).whereEquals('email', email.toLowerCase()).firstOrNull();
+    const user = await session.query<User>({ collection: "users" }).whereEquals('email', email.toLowerCase()).firstOrNull();
     return user;
 
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch user data.');
   } finally {
-    if (session) session.dispose();
-    if (store) store.dispose();
+    if (session) session.dispose(); 
   }
 }

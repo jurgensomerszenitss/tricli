@@ -5,17 +5,14 @@ import { redirect } from "next/navigation";
 import { Restaurant, User } from "@/app/lib/models";
 import { DocumentStore, IDocumentSession } from "ravendb";
 import { randomUUID } from "crypto";
-import { formSchema, FormValues } from "@/app/lib/schemas";
-import * as dotenv from "dotenv";
+import { formSchema, FormValues } from "@/app/lib/schemas"; 
 import fs from "fs";
 import { signIn } from "@/auth";
 import { AuthError } from "next-auth";
 import * as bcrypt from "bcrypt";
 import { buildTimeRanges, formatPhoneNumber } from "./maps";
-
-dotenv.config();
-const DB_NAME: string = process.env.DB_NAME ?? "";
-const DB_HOST: string = process.env.DB_HOST ?? "";
+import { store } from "@/app/lib/ravendb"
+ 
 
 export type State = {
   errors: {
@@ -48,10 +45,8 @@ function setCollection(
 }
 
 export async function createRestaurant(formData: FormValues) {
-  let validatedFields: any;
-
-  const store = new DocumentStore(DB_HOST, DB_NAME);
-  store.initialize();
+  let validatedFields: any; 
+   
   const session = store.openSession();
 
   try {
@@ -99,9 +94,7 @@ export async function createRestaurant(formData: FormValues) {
 
 export async function updateRestaurant(id: string, formData: FormValues) {
   let validatedFields: any;
-
-  const store = new DocumentStore(DB_HOST, DB_NAME);
-  store.initialize();
+ 
   const session = store.openSession();
 
   try {
@@ -158,8 +151,7 @@ export async function updateRestaurant(id: string, formData: FormValues) {
 }
 
 export async function addPhoto(id: string, file: any) {
-  const store = new DocumentStore(DB_HOST, DB_NAME);
-  store.initialize();
+   
   const session = store.openSession();
 
   // 2️⃣ Attach the image
@@ -184,8 +176,7 @@ export async function addPhoto(id: string, file: any) {
 }
 
 export async function deleteRestaurant(id: string) {
-  const store = new DocumentStore(DB_HOST, DB_NAME);
-  store.initialize();
+  
   const session = store.openSession();
 
   try {
@@ -215,8 +206,7 @@ export async function createUser(
   name: string,
   password: string,
 ) {
-  const store = new DocumentStore(DB_HOST, DB_NAME);
-  store.initialize();
+  
   const session = store.openSession();
 
   const saltRounds = 10;
